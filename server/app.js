@@ -3,7 +3,9 @@ const path = require('path');
 const utils = require('./lib/hashUtils');
 const partials = require('express-partials');
 const bodyParser = require('body-parser');
-const Auth = require('./middleware/auth');
+// const Auth = require('./middleware/auth');
+const createSession = require('../server/middleware/auth.js').createSession;
+const cookieParser = require('./middleware/cookieParser');
 const models = require('./models');
 
 const app = express();
@@ -13,6 +15,8 @@ app.set('view engine', 'ejs');
 app.use(partials());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser);   
+app.use(createSession);
 app.use(express.static(path.join(__dirname, '../public')));
 
 
@@ -78,6 +82,43 @@ app.post('/links',
 // Write your authentication routes here
 /************************************************************/
 
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.post('/login', (req, res) => {
+  var username = req.body.username;
+  var password = req.body.password;
+  return models.Users.get({username: username})
+  .then((results) => {
+    if (models.Users.compare(password, results.password, results.salt)) {
+      return res.redirect('/');
+    } else {
+      return res.redirect('/login');
+    }
+  })
+  .catch(() => {
+    return res.redirect('/login');
+  })
+});
+
+app.get('/signup', (req, res) => {
+  res.render('signup');
+});
+
+app.post('/signup', (req, res) => {
+  var username = req.body.username;
+  var password = req.body.password;
+  return models.Users.create({username, password})
+  .then(() => {
+    return res.redirect('/');
+  })
+  .catch(error => {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.redirect('/signup');
+    };
+  })
+});
 
 
 /************************************************************/
