@@ -1,7 +1,8 @@
 body {
   margin: 0;
   margin-top: 10px;
-  font-family: arial, sans-serif;
+  font-family: 'Montserrat', sans-serif;  font-size: 20px;
+  background-color: rgba(112, 207, 74, 0.9);
 }
 
 a {
@@ -11,7 +12,7 @@ a {
 }
 
 h1 {
-  font-style: italic;
+  /* font-style: italic; */
   margin-bottom: 10px;
 }
 
@@ -102,7 +103,7 @@ form {
 }
 
 form input[type=text], form input[type=password] {
-  width: 360px;
+  width: 100%;
   display: block;
   font-size: 13px;
   padding: 5px;
@@ -134,4 +135,69 @@ form input[type=text], form input[type=password] {
 
 .creator .message {
   clear: both;
+}
+
+.banner-title {
+  width: auto;
+  display: inline-block;
+  margin: 40px auto;
+  font-style: none;
+  font-family: 'Lobster', cursive;
+  font-size: 135px;
+  color: white;
+  text-align: center;
+}
+
+
+.banner-slogan {
+  width: 200px;
+  display: inline-block;
+  margin: 0 auto;
+  font-style: none;
+  font-size: 22px;
+  font-weight: 100;
+  color: rgba(199, 0, 57, 0.9);
+  text-align: left;
+}
+
+.banner-container {
+  width: 800px;
+  display: block;
+  margin: 0 auto;
+  clear: both;
+  align-content: center;
+  text-align: center;
+}
+
+.login-container {
+  padding: 50px;
+  width: 45%;
+  display: block;
+  margin: 0 auto;
+  
+}
+
+.login {
+  color: rgba(199, 0, 57, 0.9);;
+  font-family: 'Lobster', cursive;
+  font-size: 50px;
+}
+
+#create-account {
+  color: rgb(199, 0, 57, 0.9);;
+  font-size: 15px;
+}
+
+input[type=text] {
+  border: 3px solid rgb(199, 0, 57, 0.9);
+  border-radius: 4px;
+}
+
+input[type=password] {
+  border: 3px solid rgb(199, 0, 57, 0.9);
+  border-radius: 4px;
+}
+
+.username-container {
+  margin: 50px 0;
 }

@@ -23,19 +23,31 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/', 
 (req, res) => {
-  res.render('index');
+  if (req.session.userId === null) {
+    return res.redirect('/login');
+  } else {
+    res.render('index');
+  }
 });
 
 app.get('/create', 
 (req, res) => {
-  res.render('index');
+  if (req.session.userId === null) {
+    return res.redirect('/login');
+  } else {
+    res.render('index');
+  }
 });
 
 app.get('/links', 
 (req, res, next) => {
   models.Links.getAll()
     .then(links => {
-      res.status(200).send(links);
+      if (req.session.userId === null) {
+        return res.redirect('/login');
+      } else {
+        res.status(200).send(links);
+      }
     })
     .error(error => {
       res.status(500).send(error);
@@ -74,6 +86,7 @@ app.post('/links',
       res.status(500).send(error);
     })
     .catch(link => {
+      // console.log(link)
       res.status(200).send(link);
     });
 });
@@ -92,6 +105,7 @@ app.post('/login', (req, res) => {
   return models.Users.get({username: username})
   .then((results) => {
     if (models.Users.compare(password, results.password, results.salt)) {
+      models.Sessions.update({hash: req.session.hash}, {userId: results.id})
       return res.redirect('/');
     } else {
       return res.redirect('/login');
@@ -110,16 +124,33 @@ app.post('/signup', (req, res) => {
   var username = req.body.username;
   var password = req.body.password;
   return models.Users.create({username, password})
+  .then((result) => {
+    return models.Sessions.update({hash: req.session.hash}, {userId: result.insertId})
+  })
   .then(() => {
     return res.redirect('/');
   })
   .catch(error => {
     if (error.code === 'ER_DUP_ENTRY') {
       return res.redirect('/signup');
+    } else {
+      console.log('Sign up Oops')
     };
   })
 });
 
+
+app.get('/logout', (req, res) => {
+  req.cookies = {};
+  models.Sessions.delete({hash: req.session.hash})
+  .then(() => {
+    req.session = {};
+    res.redirect('/login');
+  })
+  .catch(() => {
+    console.log('cannot delete');
+  })
+});
 
 /************************************************************/
 // Handle the code parameter route last - if all other routes fail

@@ -1,7 +1,11 @@
 const models = require('../models');
 const Promise = require('bluebird');
+var request = require('request');
 
 module.exports.createSession = (req, res, next) => {
+    if (req.cookies === undefined) {
+        req.cookies = {};
+    }
     if (typeof req.cookies === 'object') {
         if (Object.keys(req.cookies).length === 0) {
             return models.Sessions.create()
@@ -12,7 +16,7 @@ module.exports.createSession = (req, res, next) => {
                 return req.session = results;
             })
             .then(() => {
-                return res.cookies = {'shortlyid' : {'value': req.session.hash}};
+                return res.cookie ('shortlyid', req.session.hash);
             })
             .then(() => {
                 next();
@@ -23,6 +27,9 @@ module.exports.createSession = (req, res, next) => {
         } else {
             return models.Sessions.get({hash: req.cookies.shortlyid})
             .then((results) => {
+                if (results === undefined) {
+                    throw ('oops');
+                }
                 req.session = results;
             })
             .then(() => {
@@ -33,9 +40,11 @@ module.exports.createSession = (req, res, next) => {
                 .then((result) => {
                     return models.Sessions.get({id: result.insertId})
                 })
-                .then((result) => {
-                    console.log(result);
-                    return res.cookies = {'shortlyid' : result.hash};
+                .then((results) => {
+                    return req.session = results;
+                })
+                .then(() => {
+                    return res.cookie ('shortlyid', req.session.hash);
                 })
                 .then(() => {
                     next();
